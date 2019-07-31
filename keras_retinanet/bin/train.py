@@ -546,7 +546,7 @@ def run_k_fold_experiment():
     
     csv_paths = [TRAIN_PATH, VAL_PATH]
     for csv_path in csv_paths:
-        metadata = pd.read_csv(csv_paths, header=None)
+        metadata = pd.read_csv(csv_path, header=None)
         metadata = metadata.replace(regex=[old_path], value=new_path)
         metadata.to_csv(csv_path)
     
