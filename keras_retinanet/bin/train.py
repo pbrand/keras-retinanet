@@ -540,7 +540,7 @@ def main(args=None):
 
 
 def train_k_fold_experiment_models():
-    NR_EPOCHS=5
+    NR_EPOCHS=100
     #WORKERS=4
     #MAX_QUEUE_SIZE=10
     BATCH_SIZE=4
