@@ -534,7 +534,7 @@ def run_k_fold_experiment():
     VAL_PATH='/mnt/synology/pelvis/projects/patrick/datasets/SPIE-retinanet/folds/0/train_val_splits/0/val.csv'
     SNAPSHOT_PATH='./snapshots'
     
-    arguments = ['--gpu=1', 
+    arguments = ['--gpu=0', 
                  '--epochs='+str(NR_EPOCHS), 
                  '--steps='+str(NR_STEPS), 
                  '--batch-size='+str(BATCH_SIZE), 
