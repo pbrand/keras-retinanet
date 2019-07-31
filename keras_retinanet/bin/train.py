@@ -543,7 +543,7 @@ def run_k_fold_experiment():
     NR_EPOCHS=100
     #WORKERS=4
     #MAX_QUEUE_SIZE=10
-    BATCH_SIZE=2
+    BATCH_SIZE=4
     
     
     TRAIN_PATH='/home/user/data/SPIE-retinanet/folds/0/train_val_splits/0/train.csv'
