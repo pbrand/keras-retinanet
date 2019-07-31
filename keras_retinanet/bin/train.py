@@ -16,6 +16,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+"""
+    This code was modified by:
+    @editor Patrick Brand
+"""
+
 import argparse
 import os
 import sys
@@ -23,6 +28,7 @@ import warnings
 
 import keras
 import keras.preprocessing.image
+import pandas as pd
 import tensorflow as tf
 
 # Allow relative imports when being executed as script.
@@ -524,14 +530,21 @@ def main(args=None):
 
 
 def run_k_fold_experiment():
+    # Replace original paths to local copy paths
+    old_path = '/mnt/synology/pelvis/projects/patrick/datasets/'
+    new_path = '/home/user/data/'
+
+    metadata = metadata.replace(regex=[old_path], value=new_path)
+    
+    
     NR_EPOCHS=10
     #WORKERS=4
     #MAX_QUEUE_SIZE=10
-    BATCH_SIZE=4
+    BATCH_SIZE=1
     NR_STEPS=15
-    TRAIN_PATH='/mnt/synology/pelvis/projects/patrick/datasets/SPIE-retinanet/folds/0/train_val_splits/0/train.csv'
-    CLASSES_PATH='/mnt/synology/pelvis/projects/patrick/datasets/SPIE-retinanet/classes.csv'
-    VAL_PATH='/mnt/synology/pelvis/projects/patrick/datasets/SPIE-retinanet/folds/0/train_val_splits/0/val.csv'
+    TRAIN_PATH='/home/user/data/SPIE-retinanet/folds/0/train_val_splits/0/train.csv'
+    CLASSES_PATH='/home/user/data/SPIE-retinanet/classes.csv'
+    VAL_PATH='/home/user/data/SPIE-retinanet/folds/0/train_val_splits/0/val.csv'
     SNAPSHOT_PATH='./snapshots'
     
     arguments = ['--gpu=0', 
