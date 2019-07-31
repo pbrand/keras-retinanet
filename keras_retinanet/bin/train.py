@@ -542,6 +542,7 @@ def run_k_fold_experiment():
                  #'--workers='+str(WORKERS),
                  #'--max-queue-size='+str(MAX_QUEUE_SIZE), 
                  '--snapshot-path='+str(SNAPSHOT_PATH),
+                 '--no-weights',
                  'csv',
                  TRAIN_PATH,
                  CLASSES_PATH,
