@@ -575,9 +575,8 @@ def train_k_fold_experiment_models():
             current_model_path = os.path.join(current_inner_fold_path, 'model')
             if not os.path.exists(current_inner_fold_path):
                 os.makedirs(current_inner_fold_path)
-                os.makedirs(current_model_path
+                os.makedirs(current_model_path)
                 
-            
             TRAIN_PATH= os.path.join(data_base_folder, 'folds/'+str(fold_nr)+'/train_val_splits/'+str(inner_fold_nr)+'/train.csv')
             CLASSES_PATH= os.path.join(data_base_folder, 'classes.csv')
             VAL_PATH= os.path.join(data_base_folder, 'folds/'+str(fold_nr)+'/train_val_splits/'+str(inner_fold_nr)+'val.csv')
