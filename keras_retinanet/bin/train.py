@@ -579,7 +579,7 @@ def train_k_fold_experiment_models():
                 
             TRAIN_PATH= os.path.join(data_base_folder, 'folds/'+str(fold_nr)+'/train_val_splits/'+str(inner_fold_nr)+'/train.csv')
             CLASSES_PATH= os.path.join(data_base_folder, 'classes.csv')
-            VAL_PATH= os.path.join(data_base_folder, 'folds/'+str(fold_nr)+'/train_val_splits/'+str(inner_fold_nr)+'val.csv')
+            VAL_PATH= os.path.join(data_base_folder, 'folds/'+str(fold_nr)+'/train_val_splits/'+str(inner_fold_nr)+'/val.csv')
             SNAPSHOT_PATH=current_model_path
             
             # Replace original paths to local copy paths
