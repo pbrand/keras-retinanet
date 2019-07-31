@@ -489,7 +489,7 @@ def main(args=None):
         )
 
     # print model summary
-    print(model.summary())
+    #print(model.summary())
 
     # this lets the generator compute backbone layer shapes using the actual backbone model
     if 'vgg' in args.backbone or 'densenet' in args.backbone:
@@ -523,5 +523,32 @@ def main(args=None):
     )
 
 
+def run_k_fold_experiment():
+    NR_EPOCHS=10
+    #WORKERS=4
+    #MAX_QUEUE_SIZE=10
+    BATCH_SIZE=8
+    NR_STEPS=15
+    TRAIN_PATH='/mnt/synology/pelvis/projects/patrick/datasets/SPIE-retinanet/folds/0/train_val_splits/0/train.csv'
+    CLASSES_PATH='/mnt/synology/pelvis/projects/patrick/datasets/SPIE-retinanet/classes.csv'
+    VAL_PATH='/mnt/synology/pelvis/projects/patrick/datasets/SPIE-retinanet/folds/0/train_val_splits/0/val.csv'
+    SNAPSHOT_PATH='./snapshots'
+    
+    arguments = ['--gpu=1', 
+                 '--epochs='+str(NR_EPOCHS), 
+                 '--steps='+str(NR_STEPS), 
+                 '--batch-size='+str(BATCH_SIZE), 
+                 '--compute-val-loss', 
+                 #'--workers='+str(WORKERS),
+                 #'--max-queue-size='+str(MAX_QUEUE_SIZE), 
+                 '--snapshot-path='+str(SNAPSHOT_PATH),
+                 'csv',
+                 TRAIN_PATH,
+                 CLASSES_PATH,
+                 '--val-annotations='+VAL_PATH]
+    
+    main(args=arguments)
+
+
 if __name__ == '__main__':
-    main()
+    run_k_fold_experiment()
