@@ -211,15 +211,15 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
         min_lr     = 0
     ))
     
-    callbacks.append(keras.callbacks.EarlyStopping(
-        monitor="mAP", 
-        min_delta=0, 
-        patience=5, 
-        verbose=1, 
-        mode='max', 
-        baseline=None, 
-        restore_best_weights=False
-    ))
+    #callbacks.append(keras.callbacks.EarlyStopping(
+        #monitor="mAP", 
+        #min_delta=0, 
+        #patience=5, 
+        #verbose=1, 
+        #mode='max', 
+        #baseline=None, 
+        #restore_best_weights=False
+    #))
 
     return callbacks
 
@@ -540,7 +540,7 @@ def main(args=None):
 
 
 def train_k_fold_experiment_models():
-    NR_EPOCHS=100
+    NR_EPOCHS=5
     #WORKERS=4
     #MAX_QUEUE_SIZE=10
     BATCH_SIZE=4
