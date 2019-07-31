@@ -190,7 +190,7 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
         checkpoint = keras.callbacks.ModelCheckpoint(
             os.path.join(
                 args.snapshot_path,
-                '{backbone}_{dataset_type}_{{epoch:02d}}.h5'.format(backbone=args.backbone, dataset_type=args.dataset_type)
+                '{backbone}_{dataset_type}.h5'.format(backbone=args.backbone, dataset_type=args.dataset_type)
             ),
             verbose=1,
             save_best_only=True,
@@ -209,6 +209,16 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
         min_delta  = 0.0001,
         cooldown   = 0,
         min_lr     = 0
+    ))
+    
+    callbacks.append(keras.callbacks.EarlyStopping(
+        monitor="mAP", 
+        min_delta=0, 
+        patience=5, 
+        verbose=1, 
+        mode='max', 
+        baseline=None, 
+        restore_best_weights=False
     ))
 
     return callbacks
@@ -530,11 +540,12 @@ def main(args=None):
 
 
 def run_k_fold_experiment():
-    NR_EPOCHS=10
+    NR_EPOCHS=100
     #WORKERS=4
     #MAX_QUEUE_SIZE=10
-    BATCH_SIZE=1
-    NR_STEPS=15
+    BATCH_SIZE=2
+    
+    
     TRAIN_PATH='/home/user/data/SPIE-retinanet/folds/0/train_val_splits/0/train.csv'
     CLASSES_PATH='/home/user/data/SPIE-retinanet/classes.csv'
     VAL_PATH='/home/user/data/SPIE-retinanet/folds/0/train_val_splits/0/val.csv'
@@ -543,12 +554,16 @@ def run_k_fold_experiment():
     # Replace original paths to local copy paths
     old_path = '/mnt/synology/pelvis/projects/patrick/datasets/'
     new_path = '/home/user/data/'
-    
     csv_paths = [TRAIN_PATH, VAL_PATH]
     for csv_path in csv_paths:
         metadata = pd.read_csv(csv_path, header=None)
         metadata = metadata.replace(regex=[old_path], value=new_path)
-        metadata.to_csv(csv_path)
+        metadata.to_csv(csv_path, header=False, index=False)
+    
+    # Count training samples in train csv
+    metadata = pd.read_csv(TRAIN_PATH, header=None, usecols=[0])
+    nr_train_samples = metadata.nunique()
+    NR_STEPS= int(nr_train_samples) // BATCH_SIZE
     
     arguments = ['--gpu=0', 
                  '--epochs='+str(NR_EPOCHS), 
