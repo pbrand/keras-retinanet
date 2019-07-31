@@ -527,7 +527,7 @@ def run_k_fold_experiment():
     NR_EPOCHS=10
     #WORKERS=4
     #MAX_QUEUE_SIZE=10
-    BATCH_SIZE=8
+    BATCH_SIZE=4
     NR_STEPS=15
     TRAIN_PATH='/mnt/synology/pelvis/projects/patrick/datasets/SPIE-retinanet/folds/0/train_val_splits/0/train.csv'
     CLASSES_PATH='/mnt/synology/pelvis/projects/patrick/datasets/SPIE-retinanet/classes.csv'
