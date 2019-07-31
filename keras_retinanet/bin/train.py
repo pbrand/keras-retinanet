@@ -530,13 +530,6 @@ def main(args=None):
 
 
 def run_k_fold_experiment():
-    # Replace original paths to local copy paths
-    old_path = '/mnt/synology/pelvis/projects/patrick/datasets/'
-    new_path = '/home/user/data/'
-
-    metadata = metadata.replace(regex=[old_path], value=new_path)
-    
-    
     NR_EPOCHS=10
     #WORKERS=4
     #MAX_QUEUE_SIZE=10
@@ -546,6 +539,16 @@ def run_k_fold_experiment():
     CLASSES_PATH='/home/user/data/SPIE-retinanet/classes.csv'
     VAL_PATH='/home/user/data/SPIE-retinanet/folds/0/train_val_splits/0/val.csv'
     SNAPSHOT_PATH='./snapshots'
+    
+    # Replace original paths to local copy paths
+    old_path = '/mnt/synology/pelvis/projects/patrick/datasets/'
+    new_path = '/home/user/data/'
+    
+    csv_paths = [TRAIN_PATH, VAL_PATH]
+    for csv_path in csv_paths:
+        metadata = pandas.read_csv(csv_paths, header=None)
+        metadata = metadata.replace(regex=[old_path], value=new_path)
+        metadata.to_csv(csv_path)
     
     arguments = ['--gpu=0', 
                  '--epochs='+str(NR_EPOCHS), 
