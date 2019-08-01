@@ -272,4 +272,5 @@ def evaluate_k_fold_experiment_models():
 
 
 if __name__ == '__main__':
-    evaluate_k_fold_experiment_models()
+    #evaluate_k_fold_experiment_models()
+    main()
