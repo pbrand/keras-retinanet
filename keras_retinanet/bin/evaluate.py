@@ -14,11 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+"""
+    This code was modified by:
+    @editor Patrick Brand
+"""
+
 import argparse
 import os
 import sys
 
 import keras
+import numpy as np
+import pandas as pd
 import tensorflow as tf
 
 # Allow relative imports when being executed as script.
@@ -187,5 +194,82 @@ def main(args=None):
         print('mAP: {:.4f}'.format(sum(precisions) / sum(x > 0 for x in total_instances)))
 
 
+def evaluate_k_fold_experiment_models():   
+    nr_kfold_train_test=5
+    nr_inner_kfold_train_val=4
+    data_base_folder = '/home/user/data/SPIE-retinanet/'
+    experiment_path = '/mnt/synology/pelvis/projects/patrick/Experiments/SPIE_Anatomical_Prior/baseline'
+    
+    iou_thresholds = range(0.5,1.0,0.05)
+    
+    
+    # Run experiments
+    for fold_nr in range(nr_kfold_train_test):
+        print('='*20)
+        print(' RUNNING FOLD NUMBER: ', fold_nr)
+        print('='*20)
+        
+        current_fold_path = os.path.join(experiment_path, 'fold_'+str(fold_nr))
+        
+        for inner_fold_nr in range(nr_inner_kfold_train_val):
+            print(' '*4,'='*20)
+            print(' '*4,' TRAIN/VAL INNER FOLD NUMBER: ', inner_fold_nr)
+            print(' '*4,'='*20)
+                
+            # Create experiment directory for current inner train/val fold
+            current_inner_fold_path = os.path.join(current_fold_path, 'inner_fold_'+str(inner_fold_nr))
+            current_model_path = os.path.join(current_inner_fold_path, 'model')
+                           
+            CLASSES_PATH= os.path.join(data_base_folder, 'classes.csv')
+            TEST_PATH= os.path.join(data_base_folder, 'folds/'+str(fold_nr)+'/test.csv')
+            SNAPSHOT_PATH=current_model_path
+            RESULTS_PATH=os.path.join(current_inner_fold_path, 'results')
+            # Create directory for results
+            os.makedirs(RESULTS_PATH)
+            
+            # Replace original paths to local copy paths
+            old_path = '/mnt/synology/pelvis/projects/patrick/datasets/'
+            new_path = '/home/user/data/'
+
+            metadata = pd.read_csv(TEST_PATH, header=None)
+            metadata = metadata.replace(regex=[old_path], value=new_path)
+            metadata.to_csv(TEST_PATH, header=False, index=False)
+            
+            # Create results csv file
+            csv_output_path = os.path.join(RESULTS_PATH, 'quantitative_results.csv')
+            qualitative_output_path = os.path.join(RESULTS_PATH, 'qualitative_results')
+            os.makedirs(os.path.join(RESULTS_PATH, 'qualitative_results'))
+            results = pd.DataFrame(iou_thresholds, columns=['IoU_threshold'])
+            
+            # Gather results
+            PZ_AP = []
+            Prostate_AP = []
+            mAP = []
+            for current_threshold in iou_thresholds:  
+                print(' '*6,'IoU threshold: 'current_threshold)
+                arguments = ['model='+os.path.join(current_model_path, 'resnet50_csv.h5'),
+                            '--gpu=0', 
+                            '--convert-model',
+                            '--iou-threshold='+str(current_threshold),
+                            '--max-detections=2',
+                            'csv',
+                            TEST_PATH,
+                            CLASSES_PATH]
+                # Only generate visual results once
+                if current_threshold == iou_thresholds[0]:
+                    arguments.insert(index=4, elem='--save-path='+qualitative_output_path)
+                
+                main(args=arguments)
+            
+            # Store AP results in csv file
+            results['PZ_AP'] = PZ_AP
+            results['Prostate_AP'] = Prostate_AP
+            results['mAP'] = mAP
+            
+            # Write results to disk
+            results.to_csv(csv_output_path, index=False)
+
+
+
 if __name__ == '__main__':
-    main()
+    evaluate_k_fold_experiment_models()
