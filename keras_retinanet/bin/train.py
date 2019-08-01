@@ -546,7 +546,11 @@ def train_k_fold_experiment_models():
     BATCH_SIZE=4
     
     nr_kfold_train_test=5
+    folds = range(nr_kfold_train_test)
     nr_inner_kfold_train_val=4
+    # Only run 1 inner fold for now
+    inner_folds=range(1) #range(nr_inner_kfold_train_val)
+    
     data_base_folder = '/home/user/data/SPIE-retinanet/'
     
     # Create folders to store trained model 
@@ -555,7 +559,7 @@ def train_k_fold_experiment_models():
         os.makedirs(experiment_path)
     
     # Run experiments
-    for fold_nr in range(nr_kfold_train_test):
+    for fold_nr in folds:
         print('='*20)
         print(' RUNNING FOLD NUMBER: ', fold_nr)
         print('='*20)
@@ -565,7 +569,8 @@ def train_k_fold_experiment_models():
         if not os.path.exists(current_fold_path):
             os.makedirs(current_fold_path)
             
-        for inner_fold_nr in range(nr_inner_kfold_train_val):
+        # Only run the first inner fold for now
+        for inner_fold_nr in inner_folds:#nr_inner_kfold_train_val):
             print(' '*4,'='*20)
             print(' '*4,' TRAIN/VAL INNER FOLD NUMBER: ', inner_fold_nr)
             print(' '*4,'='*20)
