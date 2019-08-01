@@ -540,7 +540,7 @@ def main(args=None):
 
 
 def train_k_fold_experiment_models():
-    NR_EPOCHS=100
+    NR_EPOCHS=60
     #WORKERS=4
     #MAX_QUEUE_SIZE=10
     BATCH_SIZE=4
@@ -555,7 +555,7 @@ def train_k_fold_experiment_models():
         os.makedirs(experiment_path)
     
     # Run experiments
-    for fold_nr in range(1,nr_kfold_train_test):
+    for fold_nr in range(nr_kfold_train_test):
         print('='*20)
         print(' RUNNING FOLD NUMBER: ', fold_nr)
         print('='*20)
