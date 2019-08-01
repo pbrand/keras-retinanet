@@ -555,7 +555,7 @@ def train_k_fold_experiment_models():
         os.makedirs(experiment_path)
     
     # Run experiments
-    for fold_nr in range(1:nr_kfold_train_test):
+    for fold_nr in range(1,nr_kfold_train_test):
         print('='*20)
         print(' RUNNING FOLD NUMBER: ', fold_nr)
         print('='*20)
