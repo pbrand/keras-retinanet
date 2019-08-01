@@ -246,7 +246,7 @@ def evaluate_k_fold_experiment_models():
             Prostate_AP = []
             mAP = []
             for current_threshold in iou_thresholds:  
-                print(' '*6,'IoU threshold: 'current_threshold)
+                print(' '*6,'IoU threshold: ',current_threshold)
                 arguments = ['model='+os.path.join(current_model_path, 'resnet50_csv.h5'),
                             '--gpu=0', 
                             '--convert-model',
