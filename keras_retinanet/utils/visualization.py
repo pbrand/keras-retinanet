@@ -14,6 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+"""
+    This code was modified by:
+    @editor Patrick Brand
+"""
+
 import cv2
 import numpy as np
 
@@ -46,7 +51,7 @@ def draw_caption(image, box, caption):
     cv2.putText(image, caption, (b[0], b[1] - 10), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 1)
 
 
-def draw_boxes(image, boxes, color, thickness=2):
+def draw_boxes(image, boxes, color, thickness=1):
     """ Draws boxes on an image with a given color.
 
     # Arguments
@@ -78,8 +83,8 @@ def draw_detections(image, boxes, scores, labels, color=None, label_to_name=None
         draw_box(image, boxes[i, :], color=c)
 
         # draw labels
-        caption = (label_to_name(labels[i]) if label_to_name else labels[i]) + ': {0:.2f}'.format(scores[i])
-        draw_caption(image, boxes[i, :], caption)
+        #caption = (label_to_name(labels[i]) if label_to_name else labels[i]) + ': {0:.2f}'.format(scores[i])
+        #draw_caption(image, boxes[i, :], caption)
 
 
 def draw_annotations(image, annotations, color=(0, 255, 0), label_to_name=None):
@@ -101,6 +106,6 @@ def draw_annotations(image, annotations, color=(0, 255, 0), label_to_name=None):
     for i in range(annotations['bboxes'].shape[0]):
         label   = annotations['labels'][i]
         c       = color if color is not None else label_color(label)
-        caption = '{}'.format(label_to_name(label) if label_to_name else label)
-        draw_caption(image, annotations['bboxes'][i], caption)
+        #caption = '{}'.format(label_to_name(label) if label_to_name else label)
+        #draw_caption(image, annotations['bboxes'][i], caption)
         draw_box(image, annotations['bboxes'][i], color=c)
