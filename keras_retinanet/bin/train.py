@@ -211,7 +211,7 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
         min_lr     = 0
     ))
     
-    callbacks.append(keras.callbacks.CSVLogger(os.path.join(args.snapshot-path, 'train.log'), 
+    callbacks.append(keras.callbacks.CSVLogger(os.path.join(args.snapshot_path, 'train.log'), 
                                                separator=',', append=False))
     
     #callbacks.append(keras.callbacks.EarlyStopping(
