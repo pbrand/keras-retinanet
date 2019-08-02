@@ -192,6 +192,8 @@ def main(args=None):
 
         print('mAP using the weighted average of precisions among classes: {:.4f}'.format(sum([a * b for a, b in zip(total_instances, precisions)]) / sum(total_instances)))
         print('mAP: {:.4f}'.format(sum(precisions) / sum(x > 0 for x in total_instances)))
+        
+        return average_precisions
 
 
 def evaluate_k_fold_experiment_models():   
@@ -200,7 +202,7 @@ def evaluate_k_fold_experiment_models():
     data_base_folder = '/home/user/data/SPIE-retinanet/'
     experiment_path = '/mnt/synology/pelvis/projects/patrick/Experiments/SPIE_Anatomical_Prior/baseline'
     
-    iou_thresholds = range(0.5,1.0,0.05)
+    iou_thresholds = np.arange(0.5,1.0, 0.05)
     
     
     # Run experiments
@@ -225,7 +227,8 @@ def evaluate_k_fold_experiment_models():
             SNAPSHOT_PATH=current_model_path
             RESULTS_PATH=os.path.join(current_inner_fold_path, 'results')
             # Create directory for results
-            os.makedirs(RESULTS_PATH)
+            if not os.path.exists(RESULTS_PATH):
+                os.makedirs(RESULTS_PATH)
             
             # Replace original paths to local copy paths
             old_path = '/mnt/synology/pelvis/projects/patrick/datasets/'
@@ -238,7 +241,9 @@ def evaluate_k_fold_experiment_models():
             # Create results csv file
             csv_output_path = os.path.join(RESULTS_PATH, 'quantitative_results.csv')
             qualitative_output_path = os.path.join(RESULTS_PATH, 'qualitative_results')
-            os.makedirs(os.path.join(RESULTS_PATH, 'qualitative_results'))
+            if not os.path.exists(qualitative_output_path):
+                os.makedirs(os.path.join(RESULTS_PATH, 'qualitative_results'))
+            
             results = pd.DataFrame(iou_thresholds, columns=['IoU_threshold'])
             
             # Gather results
@@ -246,20 +251,32 @@ def evaluate_k_fold_experiment_models():
             Prostate_AP = []
             mAP = []
             for current_threshold in iou_thresholds:  
-                print(' '*6,'IoU threshold: ',current_threshold)
-                arguments = ['model='+os.path.join(current_model_path, 'resnet50_csv.h5'),
-                            '--gpu=0', 
-                            '--convert-model',
-                            '--iou-threshold='+str(current_threshold),
-                            '--max-detections=2',
-                            'csv',
-                            TEST_PATH,
-                            CLASSES_PATH]
+                print(' '*8,'='*20)
+                print(' '*8,'IoU threshold: {:.2f}'.format(current_threshold))
+                print(' '*8,'='*20)
+                arguments = ['csv',
+                             TEST_PATH,
+                             CLASSES_PATH,
+                             os.path.join(current_model_path, 'resnet50_csv.h5'),
+                             '--gpu=0', 
+                             '--convert-model',
+                             '--iou-threshold='+str(current_threshold),
+                             '--max-detections=2']
                 # Only generate visual results once
                 if current_threshold == iou_thresholds[0]:
-                    arguments.insert(index=4, elem='--save-path='+qualitative_output_path)
+                    arguments.insert(4, '--save-path='+qualitative_output_path)
                 
-                main(args=arguments)
+                # Calculate measurements for current IoU threshold
+                average_precisions = main(args=arguments)
+                
+                current_pz_ap = average_precisions[0][0]
+                current_prostate_ap = average_precisions[1][0]
+                current_mAP = 0.5 * (current_pz_ap + current_prostate_ap)
+                
+                # Store current measurements
+                PZ_AP.append(current_pz_ap)
+                Prostate_AP.append(current_prostate_ap)
+                mAP.append(current_mAP)
             
             # Store AP results in csv file
             results['PZ_AP'] = PZ_AP
@@ -272,5 +289,5 @@ def evaluate_k_fold_experiment_models():
 
 
 if __name__ == '__main__':
-    #evaluate_k_fold_experiment_models()
-    main()
+    evaluate_k_fold_experiment_models()
+    #main()
