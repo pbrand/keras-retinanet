@@ -104,7 +104,7 @@ def draw_annotations(image, annotations, color=(0, 255, 0), label_to_name=None):
     assert(annotations['bboxes'].shape[0] == annotations['labels'].shape[0])
 
     for i in range(annotations['bboxes'].shape[0]):
-        label   = annotations['labels'][i]
+        label   = int(annotations['labels'][i])
         c       = color if color is not None else label_color(label)
         #caption = '{}'.format(label_to_name(label) if label_to_name else label)
         #draw_caption(image, annotations['bboxes'][i], caption)

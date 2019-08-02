@@ -26,4 +26,4 @@ def label_color(label):
 
 colors = [
     [0, 255, 0],
-    [255, 0, 0]]
+    [0, 0, 255]]
