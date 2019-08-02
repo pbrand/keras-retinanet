@@ -192,7 +192,7 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
                 args.snapshot_path,
                 '{backbone}_{dataset_type}.h5'.format(backbone=args.backbone, dataset_type=args.dataset_type)
             ),
-            verbose=1,
+            verbose=0,
             save_best_only=True,
             monitor="mAP",
             mode='max'
@@ -204,7 +204,7 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
         monitor    = 'loss',
         factor     = 0.1,
         patience   = 2,
-        verbose    = 1,
+        verbose    = 0,
         mode       = 'auto',
         min_delta  = 0.0001,
         cooldown   = 0,
