@@ -533,7 +533,7 @@ def main(args=None):
         generator=train_generator,
         steps_per_epoch=args.steps,
         epochs=args.epochs,
-        verbose=1,
+        verbose=0,
         callbacks=callbacks,
         workers=args.workers,
         use_multiprocessing=args.multiprocessing,
@@ -549,7 +549,7 @@ def train_k_fold_experiment_models():
     BATCH_SIZE=4
     
     nr_kfold_train_test=5
-    folds = range(nr_kfold_train_test)
+    folds = range(1, nr_kfold_train_test)
     nr_inner_kfold_train_val=4
     # Only run 1 inner fold for now
     inner_folds=range(1, nr_inner_kfold_train_val) #range(nr_inner_kfold_train_val)
