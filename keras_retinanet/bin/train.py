@@ -549,10 +549,10 @@ def train_k_fold_experiment_models():
     BATCH_SIZE=4
     
     nr_kfold_train_test=5
-    folds = range(1,2)# nr_kfold_train_test)
+    folds = range(2, nr_kfold_train_test)
     nr_inner_kfold_train_val=4
     # Only run 1 inner fold for now
-    inner_folds=range(3,4)# nr_inner_kfold_train_val) #range(nr_inner_kfold_train_val)
+    inner_folds=range(1, nr_inner_kfold_train_val) #range(nr_inner_kfold_train_val)
     
     data_base_folder = '/home/user/data/SPIE-retinanet/'
     
