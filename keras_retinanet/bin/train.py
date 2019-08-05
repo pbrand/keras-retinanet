@@ -132,10 +132,11 @@ def create_models(backbone_retinanet, num_classes, weights, multi_gpu=0,
     # compile model
     training_model.compile(
         loss={
-            'regression'    : losses.smooth_l1(),
+            'regression'    : losses.smooth_l1(), # KEEP IT TILL ANATOMICAL LOSS WORKS> then switch to regression_and_anatomical loss
             'classification': losses.focal()
         },
-        optimizer=keras.optimizers.adam(lr=lr, clipnorm=0.001)
+        optimizer=keras.optimizers.adam(lr=lr, clipnorm=0.001),
+        metrics=[losses.smooth_l1(), losses.anatomical()]
     )
 
     return model, training_model, prediction_model

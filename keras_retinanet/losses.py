@@ -14,6 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+"""
+    This code was modified by:
+    @editor Patrick Brand
+"""
+
 import keras
 from . import backend
 
@@ -115,3 +120,121 @@ def smooth_l1(sigma=3.0):
         return keras.backend.sum(regression_loss) / normalizer
 
     return _smooth_l1
+
+
+def anatomical(sigma=3.0):
+    """ Create a smooth L1 loss functor.
+
+    Args
+        sigma: This argument defines the point where the loss changes from L2 to L1.
+
+    Returns
+        A functor for computing the smooth L1 loss given target data and predicted data.
+    """
+    sigma_squared = sigma ** 2
+
+    def _anatomical(y_true, y_pred):
+        """ Compute the smooth L1 loss of y_pred w.r.t. y_true.
+
+        Args
+            y_true: Tensor from the generator of shape (B, N, 5). The last value for each box is the state of the anchor (ignore, negative, positive).
+            y_pred: Tensor from the network of shape (B, N, 4).
+
+        Returns
+            The smooth L1 loss of y_pred w.r.t. y_true.
+        """
+        # separate target and state
+        regression        = y_pred
+        regression_target = y_true[:, :, :-1]
+        anchor_state      = y_true[:, :, -1]
+
+        # filter out "ignore" anchors
+        indices           = backend.where(keras.backend.equal(anchor_state, 1))
+        regression        = backend.gather_nd(regression, indices)
+        regression_target = backend.gather_nd(regression_target, indices)
+
+        # compute smooth L1 anatomical loss
+        structure_one = backend.gather_nd(regression, indices[0])
+        structure_two = backend.gather_nd(regression, indices[1])
+        
+        # Prostate and PZ have the same max y value
+        anatomical_diff = structure_one[...,3] - structure_two[...,3]
+        anatomical_diff = keras.backend.abs(anatomical_diff)
+        anatomical_loss = backend.where(
+            keras.backend.less(anatomical_loss, 1.0 / sigma_squared),
+            0.5 * sigma_squared * keras.backend.pow(anatomical_loss, 2),
+            anatomical_loss - 0.5 / sigma_squared
+        )
+
+        anatomical_loss = tf.Print(anatomical_loss, [tf.shape(indices), 
+                                                     structure_one[...,3], 
+                                                     structure_two[...,3]], "incides shape, structure1_y, structure2_y")
+
+        # compute the normalizer: the number of positive anchors
+        normalizer = keras.backend.maximum(1, keras.backend.shape(indices)[0])
+        normalizer = keras.backend.cast(normalizer, dtype=keras.backend.floatx())
+        return keras.backend.sum(anatomical_loss) / normalizer
+
+    return _anatomical
+
+def regression_and_anatomical(sigma=3.0):
+    """ Create a smooth L1 loss functor.
+
+    Args
+        sigma: This argument defines the point where the loss changes from L2 to L1.
+
+    Returns
+        A functor for computing the smooth L1 loss given target data and predicted data.
+    """
+    sigma_squared = sigma ** 2
+
+    def _regression_and_anatomical(y_true, y_pred):
+        """ Compute the smooth L1 loss of y_pred w.r.t. y_true.
+
+        Args
+            y_true: Tensor from the generator of shape (B, N, 5). The last value for each box is the state of the anchor (ignore, negative, positive).
+            y_pred: Tensor from the network of shape (B, N, 4).
+
+        Returns
+            The smooth L1 loss of y_pred w.r.t. y_true.
+        """
+        # separate target and state
+        regression        = y_pred
+        regression_target = y_true[:, :, :-1]
+        anchor_state      = y_true[:, :, -1]
+
+        # filter out "ignore" anchors
+        indices           = backend.where(keras.backend.equal(anchor_state, 1))
+        regression        = backend.gather_nd(regression, indices)
+        regression_target = backend.gather_nd(regression_target, indices)
+
+        # compute smooth L1 loss
+        # f(x) = 0.5 * (sigma * x)^2          if |x| < 1 / sigma / sigma
+        #        |x| - 0.5 / sigma / sigma    otherwise
+        regression_diff = regression - regression_target
+        regression_diff = keras.backend.abs(regression_diff)
+        regression_loss = backend.where(
+            keras.backend.less(regression_diff, 1.0 / sigma_squared),
+            0.5 * sigma_squared * keras.backend.pow(regression_diff, 2),
+            regression_diff - 0.5 / sigma_squared
+        )
+
+        # Prostate and PZ have the same max y value
+        anatomical_diff = structure_one[...,3] - structure_two[...,3]
+        anatomical_diff = keras.backend.abs(anatomical_diff)
+        anatomical_loss = backend.where(
+            keras.backend.less(anatomical_loss, 1.0 / sigma_squared),
+            0.5 * sigma_squared * keras.backend.pow(anatomical_loss, 2),
+            anatomical_loss - 0.5 / sigma_squared
+        )
+
+        anatomical_loss = tf.Print(anatomical_loss, [tf.shape(indices), 
+                                                     structure_one[...,3], 
+                                                     structure_two[...,3]], "incides shape, structure1_y, structure2_y")
+
+        # compute the normalizer: the number of positive anchors
+        normalizer = keras.backend.maximum(1, keras.backend.shape(indices)[0])
+        normalizer = keras.backend.cast(normalizer, dtype=keras.backend.floatx())
+        return keras.backend.sum(regression_loss + anatomical_loss) / normalizer
+    
+    return _regression_and_anatomical
