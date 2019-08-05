@@ -211,7 +211,7 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
         min_lr     = 0
     ))
     
-    callbacks.append(keras.callbacks.CSVLogger(os.path.join(args.snapshot_path, 'train.log'), 
+    callbacks.append(keras.callbacks.CSVLogger(os.path.join(args.snapshot_path, 'train_log.csv'), 
                                                separator=',', append=False))
     
     #callbacks.append(keras.callbacks.EarlyStopping(
@@ -622,4 +622,79 @@ def train_k_fold_experiment_models():
 
 
 if __name__ == '__main__':
-    train_k_fold_experiment_models()
+    fold_nr = sys.argv[1]
+    inner_fold_nr = sys.argv[2]
+    
+    NR_EPOCHS=60
+    #WORKERS=4
+    #MAX_QUEUE_SIZE=10
+    BATCH_SIZE=4
+    
+    nr_kfold_train_test=5
+    folds = range(0, nr_kfold_train_test)
+    nr_inner_kfold_train_val=4
+    # Only run 1 inner fold for now
+    inner_folds=range(0, nr_inner_kfold_train_val) #range(nr_inner_kfold_train_val)
+    
+    data_base_folder = '/home/user/data/SPIE-retinanet/'
+    
+    # Create folders to store trained model 
+    experiment_path = '/mnt/synology/pelvis/projects/patrick/Experiments/SPIE_Anatomical_Prior/anatomical_loss'
+    if not os.path.exists(experiment_path):
+        os.makedirs(experiment_path)
+    
+    # Run experiments
+    print('='*20)
+    print(' RUNNING FOLD NUMBER: ', fold_nr)
+    print('='*20)
+    
+    # Create experiment directory for current fold
+    current_fold_path = os.path.join(experiment_path, 'fold_'+str(fold_nr))
+    if not os.path.exists(current_fold_path):
+        os.makedirs(current_fold_path)
+        
+    print(' '*4,'='*20)
+    print(' '*4,' TRAIN/VAL INNER FOLD NUMBER: ', inner_fold_nr)
+    print(' '*4,'='*20)
+    
+    # Create experiment directory for current inner train/val fold
+    current_inner_fold_path = os.path.join(current_fold_path, 'inner_fold_'+str(inner_fold_nr))
+    current_model_path = os.path.join(current_inner_fold_path, 'model')
+    if not os.path.exists(current_inner_fold_path):
+        os.makedirs(current_inner_fold_path)
+        os.makedirs(current_model_path)
+        
+    TRAIN_PATH= os.path.join(data_base_folder, 'folds/'+str(fold_nr)+'/train_val_splits/'+str(inner_fold_nr)+'/train.csv')
+    CLASSES_PATH= os.path.join(data_base_folder, 'classes.csv')
+    VAL_PATH= os.path.join(data_base_folder, 'folds/'+str(fold_nr)+'/train_val_splits/'+str(inner_fold_nr)+'/val.csv')
+    SNAPSHOT_PATH=current_model_path
+    
+    # Replace original paths to local copy paths
+    old_path = '/mnt/synology/pelvis/projects/patrick/datasets/'
+    new_path = '/home/user/data/'
+    csv_paths = [TRAIN_PATH, VAL_PATH]
+    for csv_path in csv_paths:
+        metadata = pd.read_csv(csv_path, header=None)
+        metadata = metadata.replace(regex=[old_path], value=new_path)
+        metadata.to_csv(csv_path, header=False, index=False)
+    
+    # Count training samples in train csv
+    metadata = pd.read_csv(TRAIN_PATH, header=None, usecols=[0])
+    nr_train_samples = metadata.nunique()
+    NR_STEPS= int(nr_train_samples) // BATCH_SIZE
+    
+    arguments = ['--gpu=0', 
+                '--epochs='+str(NR_EPOCHS), 
+                '--steps='+str(NR_STEPS), 
+                '--batch-size='+str(BATCH_SIZE), 
+                '--compute-val-loss', 
+                #'--workers='+str(WORKERS),
+                #'--max-queue-size='+str(MAX_QUEUE_SIZE), 
+                '--snapshot-path='+str(SNAPSHOT_PATH),
+                '--no-weights',
+                'csv',
+                TRAIN_PATH,
+                CLASSES_PATH,
+                '--val-annotations='+VAL_PATH]
+    
+    main(args=arguments)
