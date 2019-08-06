@@ -181,7 +181,7 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
         else:
             evaluation = Evaluate(validation_generator, tensorboard=tensorboard_callback, 
                                   weighted_average=args.weighted_average, verbose=1,
-                                  iou_threshold=0.5)
+                                  iou_threshold=0.75)
         evaluation = RedirectModel(evaluation, prediction_model)
         callbacks.append(evaluation)
 
