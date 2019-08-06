@@ -179,7 +179,9 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
             # use prediction model for evaluation
             evaluation = CocoEval(validation_generator, tensorboard=tensorboard_callback)
         else:
-            evaluation = Evaluate(validation_generator, tensorboard=tensorboard_callback, weighted_average=args.weighted_average, verbose=0)
+            evaluation = Evaluate(validation_generator, tensorboard=tensorboard_callback, 
+                                  weighted_average=args.weighted_average, verbose=0,
+                                  iou_threshold=0.75)
         evaluation = RedirectModel(evaluation, prediction_model)
         callbacks.append(evaluation)
 
@@ -560,7 +562,7 @@ if __name__ == '__main__':
     data_base_folder = '/home/user/data/SPIE-retinanet/'
     
     # Create folders to store trained model 
-    experiment_path =  '/mnt/synology/pelvis/projects/patrick/Experiments/SPIE_Anatomical_Prior/try_random_transform'
+    experiment_path =  '/mnt/synology/pelvis/projects/patrick/Experiments/SPIE_Anatomical_Prior/try_train_thres_75'
     if not os.path.exists(experiment_path):
         os.makedirs(experiment_path)
     
@@ -613,7 +615,7 @@ if __name__ == '__main__':
                 #'--max-queue-size='+str(MAX_QUEUE_SIZE), 
                 '--snapshot-path='+str(SNAPSHOT_PATH),
                 '--no-weights',
-                '--random-transform',
+                #'--random-transform',
                 'csv',
                 TRAIN_PATH,
                 CLASSES_PATH,
