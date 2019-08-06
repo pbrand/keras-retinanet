@@ -180,8 +180,8 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
             evaluation = CocoEval(validation_generator, tensorboard=tensorboard_callback)
         else:
             evaluation = Evaluate(validation_generator, tensorboard=tensorboard_callback, 
-                                  weighted_average=args.weighted_average, verbose=0,
-                                  iou_threshold=0.75)
+                                  weighted_average=args.weighted_average, verbose=1,
+                                  iou_threshold=0.5)
         evaluation = RedirectModel(evaluation, prediction_model)
         callbacks.append(evaluation)
 
@@ -194,7 +194,7 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
                 args.snapshot_path,
                 '{backbone}_{dataset_type}.h5'.format(backbone=args.backbone, dataset_type=args.dataset_type)
             ),
-            verbose=0,
+            verbose=1,
             save_best_only=True,
             monitor="mAP",
             mode='max'
@@ -206,7 +206,7 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
         monitor    = 'loss',
         factor     = 0.1,
         patience   = 2,
-        verbose    = 0,
+        verbose    = 1,
         mode       = 'auto',
         min_delta  = 0.0001,
         cooldown   = 0,
@@ -535,7 +535,7 @@ def main(args=None):
         generator=train_generator,
         steps_per_epoch=args.steps,
         epochs=args.epochs,
-        verbose=2,
+        verbose=0,
         callbacks=callbacks,
         workers=args.workers,
         use_multiprocessing=args.multiprocessing,
@@ -562,7 +562,7 @@ if __name__ == '__main__':
     data_base_folder = '/home/user/data/SPIE-retinanet/'
     
     # Create folders to store trained model 
-    experiment_path =  '/mnt/synology/pelvis/projects/patrick/Experiments/SPIE_Anatomical_Prior/try_train_thres_75'
+    experiment_path =  '/mnt/synology/pelvis/projects/patrick/Experiments/SPIE_Anatomical_Prior/try_undo_changes'
     if not os.path.exists(experiment_path):
         os.makedirs(experiment_path)
     
