@@ -557,7 +557,7 @@ def train_k_fold_experiment_models():
     data_base_folder = '/home/user/data/SPIE-retinanet/'
     
     # Create folders to store trained model 
-    experiment_path = '/mnt/synology/pelvis/projects/patrick/Experiments/SPIE_Anatomical_Prior/baseline'
+    experiment_path = '/mnt/synology/pelvis/projects/patrick/Experiments/SPIE_Anatomical_Prior/try_imagenet_weights'
     if not os.path.exists(experiment_path):
         os.makedirs(experiment_path)
     
@@ -612,7 +612,7 @@ def train_k_fold_experiment_models():
                         #'--workers='+str(WORKERS),
                         #'--max-queue-size='+str(MAX_QUEUE_SIZE), 
                         '--snapshot-path='+str(SNAPSHOT_PATH),
-                        '--no-weights',
+                        #'--no-weights',
                         'csv',
                         TRAIN_PATH,
                         CLASSES_PATH,
