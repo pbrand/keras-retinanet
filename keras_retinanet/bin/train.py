@@ -562,7 +562,7 @@ if __name__ == '__main__':
     data_base_folder = '/home/user/data/SPIE-retinanet/'
     
     # Create folders to store trained model 
-    experiment_path =  '/mnt/synology/pelvis/projects/patrick/Experiments/SPIE_Anatomical_Prior/try_undo_changes'
+    experiment_path =  '/mnt/synology/pelvis/projects/patrick/Experiments/SPIE_Anatomical_Prior/baseline'
     if not os.path.exists(experiment_path):
         os.makedirs(experiment_path)
     
