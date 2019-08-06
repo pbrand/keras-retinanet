@@ -546,7 +546,7 @@ if __name__ == '__main__':
     fold_nr = sys.argv[1]
     inner_fold_nr = sys.argv[2]
     
-    NR_EPOCHS=150
+    NR_EPOCHS=60
     #WORKERS=4
     #MAX_QUEUE_SIZE=10
     BATCH_SIZE=4
@@ -560,7 +560,7 @@ if __name__ == '__main__':
     data_base_folder = '/home/user/data/SPIE-retinanet/'
     
     # Create folders to store trained model 
-    experiment_path =  '/mnt/synology/pelvis/projects/patrick/Experiments/SPIE_Anatomical_Prior/try_150_epochs'
+    experiment_path =  '/mnt/synology/pelvis/projects/patrick/Experiments/SPIE_Anatomical_Prior/try_random_transform'
     if not os.path.exists(experiment_path):
         os.makedirs(experiment_path)
     
@@ -613,6 +613,7 @@ if __name__ == '__main__':
                 #'--max-queue-size='+str(MAX_QUEUE_SIZE), 
                 '--snapshot-path='+str(SNAPSHOT_PATH),
                 '--no-weights',
+                '--random-transform',
                 'csv',
                 TRAIN_PATH,
                 CLASSES_PATH,
